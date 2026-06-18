@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SmartPark RFID</title>
+
+  <!-- Bootstrap 5 -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+
+  <!-- Font Awesome -->
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div class="app-container">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="brand brand-only">
+        <h4>SmartPark</h4>
+      </div>
+
+      <nav class="menu">
+        <a href="#" class="menu-item active" data-view="dashboard">
+          <i class="fa-solid fa-chart-line"></i>
+          Dashboard
+        </a>
+
+        <a href="#" class="menu-item" data-view="espacios">
+          <i class="fa-solid fa-square-parking"></i>
+          Espacios
+        </a>
+
+        <a href="#" class="menu-item" data-view="movimientos">
+          <i class="fa-solid fa-clock-rotate-left"></i>
+          Movimientos
+        </a>
+
+        <a href="#" class="menu-item" data-view="reportes">
+          <i class="fa-solid fa-file-invoice-dollar"></i>
+          Reportes
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <p>Sistema conectado a</p>
+        <strong>AWS IoT Core + Supabase</strong>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main-content">
+
+      <!-- HEADER GENERAL -->
+      <header class="topbar">
+        <div>
+          <h1>Panel de Control</h1>
+          <p>Monitoreo de estacionamiento inteligente con RFID, AWS IoT y Supabase</p>
+        </div>
+
+        <div id="estadoAws" class="aws-badge disconnected">
+          <i class="fa-solid fa-circle-xmark"></i>
+          AWS IoT Desconectado
+        </div>
+      </header>
+
+      <!-- VISTA DASHBOARD -->
+      <section id="vista-dashboard" class="view-section active">
+
+        <!-- SUMMARY CARDS -->
+        <section class="summary-grid">
+          <div class="summary-card">
+            <div class="summary-icon blue">
+              <i class="fa-solid fa-right-to-bracket"></i>
+            </div>
+            <div>
+              <p>Autos ingresados</p>
+              <h2 id="autosIngresados">0</h2>
+            </div>
+          </div>
+
+          <div class="summary-card">
+            <div class="summary-icon green">
+              <i class="fa-solid fa-right-from-bracket"></i>
+            </div>
+            <div>
+              <p>Autos salidos</p>
+              <h2 id="autosSalidos">0</h2>
+            </div>
+          </div>
+
+          <div class="summary-card">
+            <div class="summary-icon yellow">
+              <i class="fa-solid fa-coins"></i>
+            </div>
+            <div>
+              <p>Ingresos del día</p>
+              <h2 id="ingresosDia">S/ 0.00</h2>
+            </div>
+          </div>
+
+          <div class="summary-card">
+            <div class="summary-icon purple">
+              <i class="fa-solid fa-square-parking"></i>
+            </div>
+            <div>
+              <p>Espacios disponibles</p>
+              <h2 id="disponibles">10 / 10</h2>
+            </div>
+          </div>
+        </section>
+
+        <!-- DASHBOARD PRINCIPAL -->
+        <section class="dashboard-grid">
+
+          <!-- MAPA DE ESTACIONAMIENTO -->
+          <div class="panel parking-panel dashboard-parking">
+            <div class="panel-header">
+              <div>
+                <h3>Mapa de Estacionamiento</h3>
+                <p>Estado actual de los 10 espacios</p>
+              </div>
+
+              <button id="btnReset" class="btn-reset">
+                <i class="fa-solid fa-rotate-right"></i>
+                Reiniciar
+              </button>
+            </div>
+
+            <div id="contenedorEspacios" class="parking-grid"></div>
+          </div>
+
+          <!-- ÚLTIMOS MOVIMIENTOS EN VIVO -->
+          <div class="panel movements-panel dashboard-movements">
+            <div class="panel-header">
+              <div>
+                <h3>Últimos movimientos en vivo</h3>
+                <p>Eventos recientes recibidos desde el backend</p>
+              </div>
+            </div>
+
+            <div id="movimientos" class="movements-list dashboard-movements-list"></div>
+          </div>
+
+        </section>
+      </section>
+
+      <!-- VISTA ESPACIOS -->
+      <section id="vista-espacios" class="view-section">
+        <div class="panel parking-panel">
+          <div class="panel-header">
+            <div>
+              <h3>Gestión de Espacios</h3>
+              <p>Vista completa de ocupación, vehículos asignados y tiempo activo</p>
+            </div>
+          </div>
+
+          <div id="contenedorEspaciosVista" class="parking-grid"></div>
+        </div>
+      </section>
+
+      <!-- VISTA MOVIMIENTOS -->
+      <section id="vista-movimientos" class="view-section">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <h3>Historial de Movimientos</h3>
+              <p>Registros guardados en Supabase PostgreSQL</p>
+            </div>
+
+            <button id="btnActualizarMovimientos" class="btn-reset">
+              <i class="fa-solid fa-arrows-rotate"></i>
+              Actualizar
+            </button>
+          </div>
+
+          <div class="table-container">
+            <table class="movements-table">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Tipo</th>
+                  <th>Placa</th>
+                  <th>UID</th>
+                  <th>Espacio</th>
+                  <th>Entrada</th>
+                  <th>Salida</th>
+                  <th>Minutos</th>
+                  <th>Monto</th>
+                </tr>
+              </thead>
+
+              <tbody id="tablaMovimientos">
+                <tr>
+                  <td colspan="9">Cargando movimientos desde Supabase...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- VISTA REPORTES -->
+      <section id="vista-reportes" class="view-section">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <h3>Reportes de Ingresos</h3>
+              <p>Resumen diario, semanal y mensual del estacionamiento automatizado</p>
+            </div>
+          </div>
+
+          <div class="reports-grid">
+            <div class="report-card">
+              <span>Ingresos del día</span>
+              <strong id="reporteDia">S/ 0.00</strong>
+              <small>Cobros generados durante el día actual</small>
+            </div>
+
+            <div class="report-card">
+              <span>Ingresos de la semana</span>
+              <strong id="reporteSemana">S/ 0.00</strong>
+              <small>Total acumulado de la semana</small>
+            </div>
+
+            <div class="report-card">
+              <span>Ingresos del mes</span>
+              <strong id="reporteMes">S/ 0.00</strong>
+              <small>Total acumulado mensual</small>
+            </div>
+
+            <div class="report-card">
+              <span>Tarifa actual</span>
+              <strong id="tarifaActual">S/ 0.00</strong>
+              <small>Cobro aplicado por minuto</small>
+            </div>
+          </div>
+
+          <div class="report-detail">
+            <h4>Detalle semanal</h4>
+
+            <div id="detalleSemanal" class="weekly-bars">
+              <div class="empty-message">
+                Aún no hay datos suficientes para generar el reporte semanal.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="views.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
