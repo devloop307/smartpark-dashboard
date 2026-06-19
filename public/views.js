@@ -13,7 +13,11 @@ const titulosVistas = {
   },
   reportes: {
     titulo: "Reportes de Ingresos",
-    descripcion: "Resumen diario, semanal y mensual del estacionamiento automatizado"
+    descripcion: "Resumen diario, semanal y mensual desde Supabase"
+  },
+  camara: {
+    titulo: "Cámara del Estacionamiento",
+    descripcion: "Vista en tiempo real desde la cámara móvil conectada por ngrok"
   }
 };
 
@@ -62,18 +66,23 @@ function cambiarVista(vista) {
 
   actualizarTituloVista(vista);
 
-  // Cuando entra a Movimientos, carga el historial real desde Supabase
+  // Cuando entras a Movimientos, carga la tabla desde Supabase
   if (vista === "movimientos") {
     if (typeof cargarMovimientosSupabase === "function") {
       cargarMovimientosSupabase();
     }
   }
 
-  // Cuando entra a Reportes, se refresca con el último estado recibido
+  // Cuando entras a Reportes, carga los ingresos desde Supabase
   if (vista === "reportes") {
-    if (typeof ultimoEstado !== "undefined" && ultimoEstado && typeof renderizarReportes === "function") {
-      renderizarReportes(ultimoEstado);
+    if (typeof cargarReportesSupabase === "function") {
+      cargarReportesSupabase();
     }
+  }
+
+  // Cuando entras a Cámara, refresca la imagen del stream
+  if (vista === "camara") {
+    refrescarCamara();
   }
 }
 
@@ -92,6 +101,16 @@ function actualizarTituloVista(vista) {
   if (descripcion) {
     descripcion.textContent = infoVista.descripcion;
   }
+}
+
+function refrescarCamara() {
+  const camara = document.getElementById("camaraEstacionamiento");
+
+  if (!camara) return;
+
+  const urlBase = "https://cycle-campus-iodine.ngrok-free.dev/video";
+
+  camara.src = `${urlBase}?t=${Date.now()}`;
 }
 
 document.addEventListener("DOMContentLoaded", () => {

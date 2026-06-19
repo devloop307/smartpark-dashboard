@@ -49,6 +49,11 @@
           <i class="fa-solid fa-file-invoice-dollar"></i>
           Reportes
         </a>
+
+        <a href="#" class="menu-item" data-view="camara">
+          <i class="fa-solid fa-video"></i>
+          Cámara
+        </a>
       </nav>
 
       <div class="sidebar-footer">
@@ -215,7 +220,7 @@
           <div class="panel-header">
             <div>
               <h3>Reportes de Ingresos</h3>
-              <p>Resumen diario, semanal y mensual del estacionamiento automatizado</p>
+              <p>Resumen diario, semanal y mensual calculado desde Supabase</p>
             </div>
           </div>
 
@@ -253,6 +258,41 @@
                 Aún no hay datos suficientes para generar el reporte semanal.
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VISTA CÁMARA -->
+      <section id="vista-camara" class="view-section">
+        <div class="panel camera-panel">
+          <div class="panel-header">
+            <div>
+              <h3>Cámara del Estacionamiento</h3>
+              <p>Vista en tiempo real desde la cámara móvil conectada por ngrok</p>
+            </div>
+
+            <a
+              href="https://cycle-campus-iodine.ngrok-free.dev/video"
+              target="_blank"
+              class="btn-reset"
+            >
+              <i class="fa-solid fa-up-right-from-square"></i>
+              Abrir cámara
+            </a>
+          </div>
+
+          <div class="camera-container">
+            <img
+              id="camaraEstacionamiento"
+              src="https://cycle-campus-iodine.ngrok-free.dev/video"
+              alt="Cámara del estacionamiento"
+              class="camera-stream"
+            />
+          </div>
+
+          <div class="camera-note">
+            <i class="fa-solid fa-circle-info"></i>
+            La cámara funcionará mientras el celular esté transmitiendo y ngrok permanezca abierto.
           </div>
         </div>
       </section>
