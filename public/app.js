@@ -450,6 +450,26 @@ function renderizarDetalleSemanal(datos) {
 }
 
 /* ===============================
+   CÁMARA
+================================ */
+
+function recargarCamara() {
+  const camara = document.getElementById("camaraEstacionamiento");
+
+  if (!camara) return;
+
+  camara.src = `/api/camara?t=${Date.now()}`;
+}
+
+const btnRecargarCamara = document.getElementById("btnRecargarCamara");
+
+if (btnRecargarCamara) {
+  btnRecargarCamara.addEventListener("click", () => {
+    recargarCamara();
+  });
+}
+
+/* ===============================
    SOCKET
 ================================ */
 

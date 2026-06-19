@@ -377,6 +377,60 @@ app.get("/api/historial", async (req, res) => {
 });
 
 // ===============================
+// CÁMARA DESDE NGROK
+// ===============================
+
+app.get("/api/camara", async (req, res) => {
+  const cameraUrl = process.env.CAMERA_URL;
+
+  if (!cameraUrl) {
+    return res.status(500).send("No se configuró CAMERA_URL en Render.");
+  }
+
+  try {
+    console.log("Conectando con cámara:", cameraUrl);
+
+    const respuesta = await fetch(cameraUrl, {
+      headers: {
+        "ngrok-skip-browser-warning": "true",
+        "User-Agent": "SmartPark-Dashboard"
+      }
+    });
+
+    if (!respuesta.ok) {
+      console.log("Error cámara:", respuesta.status, respuesta.statusText);
+      return res.status(502).send("No se pudo conectar con la cámara.");
+    }
+
+    const contentType =
+      respuesta.headers.get("content-type") || "multipart/x-mixed-replace";
+
+    res.setHeader("Content-Type", contentType);
+    res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    res.setHeader("Pragma", "no-cache");
+    res.setHeader("Expires", "0");
+
+    if (!respuesta.body) {
+      return res.status(502).send("La cámara no devolvió video.");
+    }
+
+    for await (const chunk of respuesta.body) {
+      res.write(Buffer.from(chunk));
+    }
+
+    res.end();
+  } catch (error) {
+    console.log("Error cargando cámara:", error.message);
+
+    if (!res.headersSent) {
+      res.status(500).send("Error cargando cámara.");
+    } else {
+      res.end();
+    }
+  }
+});
+
+// ===============================
 // REPORTES DESDE SUPABASE
 // ===============================
 
@@ -511,6 +565,7 @@ console.log("Topic scan:", topicScan);
 console.log("Topic comando:", topicComando);
 console.log("Tarifa:", `S/ ${RATE_PER_MINUTE.toFixed(2)} por minuto`);
 console.log("Cooldown:", `${READ_COOLDOWN_SECONDS} segundos`);
+console.log("Camera URL:", process.env.CAMERA_URL || "No configurada");
 console.log("======================================");
 
 probarConexionDB();

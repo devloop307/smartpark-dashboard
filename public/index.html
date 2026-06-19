@@ -271,20 +271,16 @@
               <p>Vista en tiempo real desde la cámara móvil conectada por ngrok</p>
             </div>
 
-            <a
-              href="https://cycle-campus-iodine.ngrok-free.dev/video"
-              target="_blank"
-              class="btn-reset"
-            >
-              <i class="fa-solid fa-up-right-from-square"></i>
-              Abrir cámara
-            </a>
+            <button id="btnRecargarCamara" class="btn-reset" type="button">
+              <i class="fa-solid fa-arrows-rotate"></i>
+              Recargar cámara
+            </button>
           </div>
 
           <div class="camera-container">
             <img
               id="camaraEstacionamiento"
-              src="https://cycle-campus-iodine.ngrok-free.dev/video"
+              src="/api/camara"
               alt="Cámara del estacionamiento"
               class="camera-stream"
             />
@@ -292,7 +288,7 @@
 
           <div class="camera-note">
             <i class="fa-solid fa-circle-info"></i>
-            La cámara funcionará mientras el celular esté transmitiendo y ngrok permanezca abierto.
+            La cámara funcionará dentro del dashboard mientras el celular esté transmitiendo y ngrok permanezca abierto.
           </div>
         </div>
       </section>
