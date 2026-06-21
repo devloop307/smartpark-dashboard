@@ -17,7 +17,7 @@ const titulosVistas = {
   },
   camara: {
     titulo: "Cámara del Estacionamiento",
-    descripcion: "Vista en tiempo real desde la cámara móvil conectada por Cloudflare Tunnel"
+    descripcion: "Vista en tiempo real desde la cámara móvil conectada por ngrok"
   }
 };
 
@@ -66,18 +66,21 @@ function cambiarVista(vista) {
 
   actualizarTituloVista(vista);
 
+  // Cuando entras a Movimientos, carga la tabla desde Supabase
   if (vista === "movimientos") {
     if (typeof cargarMovimientosSupabase === "function") {
       cargarMovimientosSupabase();
     }
   }
 
+  // Cuando entras a Reportes, carga los ingresos desde Supabase
   if (vista === "reportes") {
     if (typeof cargarReportesSupabase === "function") {
       cargarReportesSupabase();
     }
   }
 
+  // Cuando entras a Cámara, refresca la imagen del stream
   if (vista === "camara") {
     refrescarCamara();
   }
@@ -105,7 +108,9 @@ function refrescarCamara() {
 
   if (!camara) return;
 
-  camara.src = `/api/camara?t=${Date.now()}`;
+  const urlBase = "https://springer-rouge-stands-reporters.trycloudflare.com/";
+
+  camara.src = `${urlBase}?t=${Date.now()}`;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
